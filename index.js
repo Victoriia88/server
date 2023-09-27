@@ -1,18 +1,17 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const { log } = require("console");
+const { createServer } = require("node:http");
+const { readFile } = require("node:fs");
+const { extname } = require("node:path");
 
-const server = http.createServer((request, response) => {
+createServer(function (request, response) {
   console.log("request ", request.url);
 
-  let filePath = "." + request.url;
+  var filePath = "." + request.url;
   if (filePath == "./") {
     filePath = "./index.html";
   }
 
-  const extname = String(path.extname(filePath)).toLowerCase();
-  const mimeTypes = {
+  var ext = extname(filePath).toLowerCase();
+  var mimeTypes = {
     ".html": "text/html",
     ".js": "text/javascript",
     ".css": "text/css",
@@ -30,12 +29,12 @@ const server = http.createServer((request, response) => {
     ".wasm": "application/wasm",
   };
 
-  const contentType = mimeTypes[extname] || "application/octet-stream";
+  var contentType = mimeTypes[ext] || "application/octet-stream";
 
-  fs.readFile(filePath, (error, content) => {
+  readFile(filePath, function (error, content) {
     if (error) {
       if (error.code == "ENOENT") {
-        fs.readFile("./404.html", (error, content) => {
+        readFile("./404.html", function (error, content) {
           response.writeHead(404, { "Content-Type": "text/html" });
           response.end(content, "utf-8");
         });
@@ -50,9 +49,6 @@ const server = http.createServer((request, response) => {
       response.end(content, "utf-8");
     }
   });
-});
+}).listen(8125);
 
-const PORT = 8125;
-server.listen(PORT, () => {
-  console.log(`Server running at http://127.0.0.1:${PORT}/`);
-});
+console.log("Server running at http://127.0.0.1:8125/");
