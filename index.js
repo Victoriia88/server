@@ -2,16 +2,16 @@ const { createServer } = require("node:http");
 const { readFile } = require("node:fs");
 const { extname } = require("node:path");
 
-createServer(function (request, response) {
+const server = createServer(function (request, response) {
   console.log("request ", request.url);
 
-  var filePath = "." + request.url;
+  let filePath = "." + request.url;
   if (filePath == "./") {
     filePath = "./index.html";
   }
 
-  var ext = extname(filePath).toLowerCase();
-  var mimeTypes = {
+  const extnameValue = String(extname(filePath)).toLowerCase();
+  const mimeTypes = {
     ".html": "text/html",
     ".js": "text/javascript",
     ".css": "text/css",
@@ -29,7 +29,7 @@ createServer(function (request, response) {
     ".wasm": "application/wasm",
   };
 
-  var contentType = mimeTypes[ext] || "application/octet-stream";
+  const contentType = mimeTypes[extnameValue] || "application/octet-stream";
 
   readFile(filePath, function (error, content) {
     if (error) {
@@ -49,6 +49,7 @@ createServer(function (request, response) {
       response.end(content, "utf-8");
     }
   });
-}).listen(8125);
+});
 
+server.listen(8125);
 console.log("Server running at http://127.0.0.1:8125/");
